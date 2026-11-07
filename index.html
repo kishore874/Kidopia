@@ -1,319 +1,144 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KIDOPIA - Play Learn Explore</title>
-
-<style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Trebuchet MS', sans-serif;
-  background: #101638;
-  color: white;
-  min-height: 100vh;
-}
-
-header {
-  padding: 20px;
-  text-align: center;
-  background: linear-gradient(135deg,#633cff,#147de8);
-  border-radius: 0 0 25px 25px;
-}
-
-.logo {
-  font-size: 36px;
-  font-weight: 900;
-  color: #ffe66d;
-  text-shadow: 2px 3px #4524a8;
-}
-
-header p {
-  margin-top: 5px;
-}
-
-.stats {
-  display: flex;
-  justify-content: space-around;
-  gap: 8px;
-  padding: 15px 10px;
-}
-
-.stat {
-  background: #202b57;
-  padding: 12px 8px;
-  border-radius: 14px;
-  text-align: center;
-  flex: 1;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-h2 {
-  padding: 15px 18px;
-  font-size: 21px;
-}
-
-.player {
-  margin: 10px 15px;
-  padding: 18px;
-  border-radius: 20px;
-  background: linear-gradient(120deg,#763cff,#dc48b7);
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.avatar {
-  font-size: 55px;
-}
-
-.player button {
-  margin-top: 8px;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 20px;
-  background: #ffe66d;
-  font-weight: bold;
-}
-
-.games {
-  display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
-  gap: 12px;
-  padding: 12px;
-}
-
-.game {
-  min-width: 0;
-  padding: 18px 8px;
-  text-align: center;
-  border-radius: 20px;
-  background: #202b57;
-  border: 1px solid #394b86;
-  cursor: pointer;
-  transition: .2s;
-}
-
-.game:active {
-  transform: scale(.95);
-}
-
-.game .icon {
-  font-size: 42px;
-}
-
-.game h3 {
-  margin-top: 8px;
-  font-size: 16px;
-}
-
-.game p {
-  font-size: 12px;
-  color: #c5d1ff;
-  margin-top: 5px;
-}
-
-.mission {
-  margin: 10px 15px;
-  padding: 18px;
-  background: #202b57;
-  border-radius: 18px;
-}
-
-.mission button {
-  background: #20c997;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 12px;
-  width: 100%;
-  margin-top: 12px;
-  font-weight: bold;
-}
-
-nav {
-  display: flex;
-  justify-content: space-around;
-  background: #202b57;
-  padding: 14px 3px;
-  margin-top: 20px;
-}
-
-nav button {
-  color: white;
-  background: none;
-  border: none;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-nav span {
-  display: block;
-  font-size: 23px;
-  margin-bottom: 5px;
-}
-
-#message {
-  text-align: center;
-  padding: 18px;
-  color: #ffe66d;
-  font-weight: bold;
-}
-
-@media(min-width:600px) {
-  .games {
-    grid-template-columns: repeat(3,minmax(0,1fr));
-  }
-
-  main {
-    max-width: 850px;
-    margin: auto;
-  }
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7657e8">
+  <title>Kidopia — Play, Learn & Care</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Kidopia home"><span class="brand-mark">✦</span> kidopia</a>
+      <div class="top-actions">
+        <span class="points-pill" aria-label="Points"><span>⭐</span><strong id="headerPoints">0</strong></span>
+        <button class="avatar-button" id="profileShortcut" aria-label="Open profile">🐼</button>
+      </div>
+    </header>
 
-<header>
-  <div class="logo">🌈 KIDOPIA</div>
-  <p>Play • Learn • Earn • Explore</p>
-</header>
+    <main>
+      <section class="view active" id="homeView">
+        <div class="welcome-card">
+          <div>
+            <p class="eyebrow">YOUR HAPPY PLACE</p>
+            <h1>Hey, <span id="welcomeName">Explorer</span>! 👋</h1>
+            <p>Little steps, big adventures. What shall we do today?</p>
+            <button class="primary-button" data-go="games">Let's play <span>→</span></button>
+          </div>
+          <div class="welcome-art" aria-hidden="true">🦊</div>
+          <span class="sparkle sparkle-one">✦</span><span class="sparkle sparkle-two">✧</span>
+        </div>
 
-<div class="stats">
-  <div class="stat">🪙 <span id="coins">500</span><br>Coins</div>
-  <div class="stat">💎 20<br>Gems</div>
-  <div class="stat">⚡ <span id="energy">80</span><br>Energy</div>
-  <div class="stat">⭐ 1<br>Level</div>
-</div>
+        <div class="section-heading"><div><p class="eyebrow">YOUR WORLD</p><h2>Choose a mode</h2></div></div>
+        <div class="mode-grid">
+          <button class="mode-card pet-mode" data-go="pets"><span class="mode-emoji">🐾</span><strong>Pet world</strong><small>Meet your new friend</small><span class="card-arrow">↗</span></button>
+          <button class="mode-card game-mode" data-go="games"><span class="mode-emoji">🎮</span><strong>Kids zone</strong><small>Play & learn</small><span class="card-arrow">↗</span></button>
+          <button class="mode-card parent-mode" data-go="parents"><span class="mode-emoji">🧡</span><strong>Parent corner</strong><small>Grown-ups only</small><span class="card-arrow">↗</span></button>
+          <button class="mode-card reward-mode" data-go="rewards"><span class="mode-emoji">🎁</span><strong>My rewards</strong><small>Spend your stars</small><span class="card-arrow">↗</span></button>
+        </div>
 
-<main>
+        <div class="daily-card">
+          <div class="daily-icon">💡</div>
+          <div><p class="eyebrow">TODAY'S LITTLE CHALLENGE</p><strong>Answer a question and earn stars!</strong><p>Ask a parent to add a new question.</p></div>
+          <button class="round-button" data-go="games" aria-label="Go to games">→</button>
+        </div>
+      </section>
 
-<div class="player">
-  <div class="avatar">🧒</div>
-  <div>
-    <h3>Welcome, Explorer!</h3>
-    <p>Level 1 • Beginner</p>
-    <button onclick="alert('Character customization coming soon!')">
-      Customize Character
-    </button>
+      <section class="view" id="petsView">
+        <div class="page-heading"><p class="eyebrow">PET WORLD</p><h1>Pick your buddy 🐾</h1><p>Choose a friend and make them feel at home.</p></div>
+        <div class="pet-grid" id="petGrid"></div>
+        <div class="selected-pet-card" id="selectedPetCard"></div>
+        <div class="section-heading"><div><p class="eyebrow">MAKE IT CUTE</p><h2>Accessory shop</h2></div><span class="mini-points">⭐ <b id="shopPoints">0</b></span></div>
+        <div class="shop-grid" id="shopGrid"></div>
+      </section>
+
+      <section class="view" id="gamesView">
+        <div class="page-heading"><p class="eyebrow">KIDS ZONE</p><h1>Play & learn 🎮</h1><p>Try a game or answer a family question.</p></div>
+        <div class="game-card">
+          <div class="game-icon">🧠</div><div class="game-copy"><p class="eyebrow">QUICK QUIZ</p><h2>Brainy stars</h2><p>Answer a simple question and collect 5 stars.</p></div>
+          <button class="primary-button" id="startQuiz">Play</button>
+        </div>
+        <div class="quiz-panel hidden" id="quizPanel">
+          <div class="quiz-top"><span class="eyebrow">QUESTION TIME</span><span class="question-count" id="questionCount">1 / 1</span></div>
+          <h2 id="quizQuestion">Loading question…</h2>
+          <div class="answer-list" id="answerList"></div>
+          <p class="feedback" id="quizFeedback" aria-live="polite"></p>
+          <button class="secondary-button hidden" id="nextQuestion">Next question</button>
+        </div>
+        <div class="game-card number-game">
+          <div class="game-icon">🔢</div><div class="game-copy"><p class="eyebrow">NUMBER FUN</p><h2>Number guess</h2><p>Guess a number from 1 to 5.</p></div>
+          <button class="primary-button" id="numberGame">Play</button>
+        </div>
+        <div class="parent-questions">
+          <div><p class="eyebrow">FROM YOUR FAMILY</p><h2>Parent questions</h2><p>Answer questions your parent has added.</p></div>
+          <div id="parentQuestionList"></div>
+        </div>
+      </section>
+
+      <section class="view" id="parentsView">
+        <div class="page-heading"><p class="eyebrow">PARENT CORNER</p><h1>Grown-up space 🔒</h1><p>Manage questions and your child's rewards.</p></div>
+        <div class="parent-lock" id="parentLock">
+          <div class="lock-emoji">🔐</div><h2>Parent PIN required</h2><p>Enter the demo PIN to open parent tools.</p>
+          <label for="parentPin">4-digit PIN</label><input id="parentPin" type="password" inputmode="numeric" maxlength="4" placeholder="Enter PIN">
+          <button class="primary-button full-button" id="unlockParent">Unlock parent corner</button>
+          <p class="hint">Demo PIN: <b>2468</b>. Change it in app.js before sharing this demo.</p>
+          <p class="feedback" id="pinFeedback" aria-live="polite"></p>
+        </div>
+        <div class="parent-tools hidden" id="parentTools">
+          <div class="parent-summary"><span>👧</span><div><strong id="parentChildName">Explorer</strong><small>Child profile · <span id="parentChildUsername">@explorer</span></small></div><b>⭐ <span id="parentPoints">0</span></b></div>
+          <div class="form-card">
+            <p class="eyebrow">CREATE A QUESTION</p><h2>Add a family question</h2>
+            <label for="newQuestion">Question</label><input id="newQuestion" maxlength="140" placeholder="Example: What is 5 + 3?">
+            <label for="newAnswer">Correct answer</label><input id="newAnswer" maxlength="80" placeholder="Example: 8">
+            <label for="questionPoints">Stars to award</label><select id="questionPoints"><option value="5">5 stars</option><option value="10">10 stars</option><option value="15">15 stars</option></select>
+            <button class="primary-button full-button" id="addQuestion">Add question</button>
+            <p class="feedback" id="addFeedback" aria-live="polite"></p>
+          </div>
+          <div class="form-card"><div class="section-heading"><h2>Manage questions</h2><button class="text-button" id="parentLogout">Lock ↗</button></div><div id="manageQuestions"></div></div>
+          <div class="safety-note">Parent tip: Use questions that are kind, age-appropriate and fun. This demo stores data only in this browser.</div>
+        </div>
+      </section>
+
+      <section class="view" id="rewardsView">
+        <div class="page-heading"><p class="eyebrow">YOUR TREASURE CHEST</p><h1>Rewards & stars ⭐</h1><p>Earn stars by learning, then spend them in Pet World.</p></div>
+        <div class="points-hero"><span>⭐</span><div><small>YOUR STAR BALANCE</small><strong id="bigPoints">0</strong></div><div class="points-confetti">✦ ✧ ✦</div></div>
+        <div class="reward-list">
+          <div><span>🧠</span><div><strong>Finish a quiz</strong><small>Earn 5 stars for a correct answer</small></div><b>+5 ⭐</b></div>
+          <div><span>👨‍👩‍👧</span><div><strong>Parent question</strong><small>Earn the stars set by your parent</small></div><b>+5–15 ⭐</b></div>
+          <div><span>🐾</span><div><strong>Pet accessories</strong><small>Use stars to decorate your buddy</small></div><b>From 10 ⭐</b></div>
+        </div>
+        <button class="primary-button full-button" data-go="pets">Visit pet shop →</button>
+      </section>
+
+      <section class="view" id="profileView">
+        <div class="page-heading"><p class="eyebrow">YOUR LITTLE SPACE</p><h1>My profile ✨</h1></div>
+        <div class="profile-card">
+          <div class="profile-avatar" id="profileAvatar">🐼</div><h2 id="profileDisplayName">Explorer</h2><p id="profileHandle">@explorer</p>
+          <div class="profile-stats"><div><strong id="profilePoints">0</strong><small>Stars</small></div><div><strong id="profilePet">None</strong><small>Pet buddy</small></div></div>
+        </div>
+        <div class="form-card">
+          <p class="eyebrow">EDIT PROFILE</p><h2>Make it yours</h2>
+          <label for="profileName">Your name</label><input id="profileName" maxlength="24" placeholder="Your name">
+          <label for="profileNickname">Nickname</label><input id="profileNickname" maxlength="20" placeholder="What should we call you?">
+          <label for="profileUsername">Username</label><input id="profileUsername" maxlength="18" placeholder="Choose a username">
+          <label>Choose an avatar</label><div class="avatar-picker" id="avatarPicker"></div>
+          <button class="primary-button full-button" id="saveProfile">Save profile</button><p class="feedback" id="profileFeedback" aria-live="polite"></p>
+        </div>
+        <p class="privacy-note">Demo account: profile information is saved on this device only. Do not enter private details.</p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-nav="home"><span>⌂</span><small>Home</small></button>
+      <button class="nav-item" data-nav="pets"><span>🐾</span><small>Pets</small></button>
+      <button class="nav-item" data-nav="games"><span>🎮</span><small>Games</small></button>
+      <button class="nav-item" data-nav="rewards"><span>🎁</span><small>Rewards</small></button>
+      <button class="nav-item" data-nav="profile"><span>☺</span><small>Profile</small></button>
+    </nav>
   </div>
-</div>
 
-<h2>🎮 Explore Game World</h2>
-
-<div class="games">
-
-  <div class="game" onclick="playGame('Racing World')">
-    <div class="icon">🏎️</div>
-    <h3>Racing World</h3>
-    <p>Speed and adventure!</p>
-  </div>
-
-  <div class="game" onclick="playGame('Space Explorer')">
-    <div class="icon">🚀</div>
-    <h3>Space Explorer</h3>
-    <p>Explore the universe!</p>
-  </div>
-
-  <div class="game" onclick="playGame('Puzzle Master')">
-    <div class="icon">🧩</div>
-    <h3>Puzzle Master</h3>
-    <p>Train your brain!</p>
-  </div>
-
-  <div class="game" onclick="playGame('Adventure Quest')">
-    <div class="icon">🏰</div>
-    <h3>Adventure Quest</h3>
-    <p>Discover new worlds!</p>
-  </div>
-
-  <div class="game" onclick="playGame('Maths Games')">
-    <div class="icon">🔢</div>
-    <h3>Maths Games</h3>
-    <p>Learn with fun!</p>
-  </div>
-
-  <div class="game" onclick="playGame('Treasure Hunt')">
-    <div class="icon">💎</div>
-    <h3>Treasure Hunt</h3>
-    <p>Find hidden treasures!</p>
-  </div>
-
-  <div class="game" onclick="playGame('Pet Adventure')">
-    <div class="icon">🐼</div>
-    <h3>Pet Adventure</h3>
-    <p>Meet your new friend!</p>
-  </div>
-
-  <div class="game" onclick="playGame('Build Your City')">
-    <div class="icon">🏡</div>
-    <h3>Build Your City</h3>
-    <p>Create your dream city!</p>
-  </div>
-
-</div>
-
-<h2>🎯 Daily Mission</h2>
-
-<div class="mission">
-  <h3>🌟 First Explorer</h3>
-  <p>Explore any game in KIDOPIA.</p>
-  <button onclick="completeMission()">Collect 50 Coins</button>
-</div>
-
-<div id="message" aria-live="polite">
-  ✨ Your adventure starts here!
-</div>
-
-</main>
-
-<nav>
-  <button onclick="showMessage('Home')"><span>🏠</span>Home</button>
-  <button onclick="showMessage('Shop coming soon!')"><span>🛒</span>Shop</button>
-  <button onclick="showMessage('Pets coming soon!')"><span>🐾</span>Pets</button>
-  <button onclick="showMessage('Missions coming soon!')"><span>🏆</span>Missions</button>
-  <button onclick="showMessage('Achievements coming soon!')"><span>⭐</span>Rewards</button>
-</nav>
-
-<script>
-let coins = 500;
-let energy = 80;
-let missionDone = false;
-
-function showMessage(text) {
-  document.getElementById('message').textContent = text;
-}
-
-function playGame(name) {
-  if (energy < 10) {
-    showMessage('⚡ Your energy is low! Take a break.');
-    return;
-  }
-
-  energy -= 10;
-  document.getElementById('energy').textContent = energy;
-  showMessage('🎮 Welcome to ' + name + '! Game coming soon.');
-}
-
-function completeMission() {
-  if (missionDone) {
-    showMessage('🏆 Mission already completed!');
-    return;
-  }
-
-  missionDone = true;
-  coins += 50;
-  document.getElementById('coins').textContent = coins;
-  showMessage('🎉 Mission completed! You earned 50 coins!');
-}
-</script>
-
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
 </body>
 </html>
