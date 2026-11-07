@@ -30,3 +30,20 @@
 .shoot-score{text-align:center;font-size:12px;font-weight:900;color:var(--muted)}
 .shoot-targets{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:13px 0}
 .shoot-target{font-size:27px;min-height:60px}
+
+/* Kidopia v1.3: visible pet dress-up and reliable touch game controls */
+.pet-dressup{position:relative;width:92px;height:92px;flex:0 0 92px;display:grid;place-items:center;background:#f2efff;border-radius:23px}
+.pet-dressup .selected-pet-art{font-size:59px;line-height:1}
+.pet-wear{position:absolute;font-size:24px;line-height:1;filter:drop-shadow(0 2px 2px #44335533);pointer-events:none}
+.wear-glasses{left:31px;top:31px;font-size:25px}
+.wear-bow{right:12px;top:5px;font-size:24px}
+.wear-crown{left:31px;top:-8px;font-size:27px}
+.wear-flower{right:5px;top:24px;font-size:22px}
+.wear-scarf{left:31px;bottom:7px;font-size:27px}
+.wear-star{left:5px;top:4px;font-size:21px}
+.pet-description{min-width:0;flex:1}.wear-caption{display:block;color:#8b62c9;font-size:10px;font-weight:800;margin-top:6px}
+.arcade-panel{scroll-margin-top:80px}
+.arcade-panel button,.mini-game-panel button,.gate-panel button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.lane-buttons button:disabled{opacity:.45}
+.tic-cell{touch-action:manipulation;min-height:76px}
+.shoot-target{touch-action:manipulation;min-height:64px}

@@ -34,7 +34,7 @@ const quizQuestions = [
 ];
 const defaults = {
   name:"Explorer", nickname:"Explorer", username:"explorer", avatar:"🐼",
-  points:30, selectedPet:"panda", ownedPets:["panda"], ownedAccessories:[],
+  points:30, selectedPet:"panda", ownedPets:["panda"], ownedAccessories:[], equippedAccessories:[],
   questions:starterQuestions, answered:[]
 };
 let state = loadState();
@@ -42,11 +42,20 @@ let currentQuiz = null;
 let quizAnswered = false;
 let chosenAvatar = state.avatar;
 
+function cloneDefaults(){ return JSON.parse(JSON.stringify(defaults)); }
 function loadState(){
   try {
-    const saved = JSON.parse(localStorage.getItem("kidopiaDemo"));
-    return saved ? {...structuredClone(defaults), ...saved} : structuredClone(defaults);
-  } catch { return structuredClone(defaults); }
+    const saved = JSON.parse(localStorage.getItem("kidopiaDemo") || "null");
+    const merged = saved && typeof saved === "object" ? {...cloneDefaults(), ...saved} : cloneDefaults();
+    // Repair older saved versions and incomplete browser storage safely.
+    ["ownedPets","ownedAccessories","equippedAccessories","questions","answered"].forEach(k=>{
+      if(!Array.isArray(merged[k])) merged[k]=cloneDefaults()[k];
+    });
+    // Previously purchased accessories become equipped automatically after this update.
+    if(!saved || !Array.isArray(saved.equippedAccessories)) merged.equippedAccessories=[...merged.ownedAccessories];
+    if(!pets.some(p=>p.id===merged.selectedPet)) merged.selectedPet="panda";
+    return merged;
+  } catch (err) { return cloneDefaults(); }
 }
 function saveState(){ localStorage.setItem("kidopiaDemo", JSON.stringify(state)); renderAll(); }
 function clean(text){ return String(text ?? "").trim(); }
@@ -96,8 +105,9 @@ function renderPets(){
   }).join("");
   document.querySelectorAll("[data-pet]").forEach(btn=>btn.addEventListener("click",()=>choosePet(btn.dataset.pet)));
   const pet=pets.find(p=>p.id===state.selectedPet)||pets[0];
-  const accessoryIcons=state.ownedAccessories.map(id=>accessories.find(a=>a.id===id)?.emoji).filter(Boolean).join(" ");
-  $("selectedPetCard").innerHTML=`<span class="selected-pet-art">${pet.emoji}</span><div><p class="eyebrow">YOUR CURRENT BUDDY</p><h2>${pet.name} ${accessoryIcons}</h2><p>${pet.desc}</p></div>`;
+  const worn=(state.equippedAccessories||[]).map(id=>accessories.find(a=>a.id===id)).filter(Boolean);
+  const wearMarkup=worn.map(a=>`<span class="pet-wear wear-${a.id}" aria-label="${a.name}">${a.emoji}</span>`).join("");
+  $("selectedPetCard").innerHTML=`<div class="pet-dressup"><span class="selected-pet-art">${pet.emoji}</span>${wearMarkup}</div><div class="pet-description"><p class="eyebrow">YOUR CURRENT BUDDY</p><h2>${pet.name}</h2><p>${pet.desc}</p><small class="wear-caption">${worn.length ? "Looking stylish! Accessories are being worn." : "Buy an accessory to dress up your pet!"}</small></div>`;
 }
 function choosePet(id){
   const pet=pets.find(p=>p.id===id); if(!pet)return;
@@ -111,14 +121,26 @@ function choosePet(id){
 function renderShop(){
   $("shopGrid").innerHTML=accessories.map(a=>{
     const owned=state.ownedAccessories.includes(a.id);
-    return `<div class="shop-item"><span>${a.emoji}</span><div><strong>${a.name}</strong><small>${owned?"Already yours":a.price+" stars"}</small></div><button data-accessory="${a.id}" ${owned?"disabled":""}>${owned?"Owned":"Get"}</button></div>`;
+    const wearing=(state.equippedAccessories||[]).includes(a.id);
+    return `<div class="shop-item"><span>${a.emoji}</span><div><strong>${a.name}</strong><small>${wearing?"Your pet is wearing it":owned?"In your collection":a.price+" stars"}</small></div><button data-accessory="${a.id}">${wearing?"Remove":owned?"Wear":"Buy"}</button></div>`;
   }).join("");
   document.querySelectorAll("[data-accessory]").forEach(b=>b.addEventListener("click",()=>buyAccessory(b.dataset.accessory)));
 }
 function buyAccessory(id){
-  const a=accessories.find(x=>x.id===id); if(!a||state.ownedAccessories.includes(id))return;
-  if(state.points<a.price){showToast("Keep learning to earn more stars!");return;}
-  state.points-=a.price;state.ownedAccessories.push(id);saveState();showToast(a.name+" added to your collection!");
+  const a=accessories.find(x=>x.id===id); if(!a)return;
+  if(!state.ownedAccessories.includes(id)){
+    if(state.points<a.price){showToast("Keep learning to earn more stars!");return;}
+    state.points-=a.price;state.ownedAccessories.push(id);
+    if(!Array.isArray(state.equippedAccessories))state.equippedAccessories=[];
+    state.equippedAccessories.push(id);
+    saveState();showToast(a.name+" bought! Your pet is wearing it!");return;
+  }
+  if(!Array.isArray(state.equippedAccessories))state.equippedAccessories=[];
+  if(state.equippedAccessories.includes(id)){
+    state.equippedAccessories=state.equippedAccessories.filter(x=>x!==id);
+    showToast(a.name+" removed.");
+  } else { state.equippedAccessories.push(id);showToast("Your pet is wearing "+a.name+"!"); }
+  saveState();
 }
 function renderAvatarPicker(){
   $("avatarPicker").innerHTML=avatars.map(a=>`<button type="button" class="avatar-choice ${chosenAvatar===a?"selected":""}" data-avatar="${a}">${a}</button>`).join("");
@@ -132,6 +154,8 @@ $("saveProfile").addEventListener("click",()=>{
 });
 
 function startQuiz(){
+  ["miniGamePanel","parentGatePanel","ticTacToePanel","racePanel","shootPanel"].forEach(id=>$(id).classList.add("hidden"));
+  $("quizPanel").classList.remove("hidden");
   currentQuiz=quizQuestions[Math.floor(Math.random()*quizQuestions.length)];
   quizAnswered=false;$("quizPanel").classList.remove("hidden");$("questionCount").textContent="Quick quiz";
   $("quizQuestion").textContent=currentQuiz.q;$("quizFeedback").textContent="";
@@ -158,6 +182,7 @@ let pendingAfterGate = null;
 let activeGateQuestion = null;
 
 function openMiniGame(label, question, answers, correct, points=3){
+  ["quizPanel","parentGatePanel","ticTacToePanel","racePanel","shootPanel"].forEach(id=>$(id).classList.add("hidden"));
   miniGameMode = label;
   $("miniGameLabel").textContent = label.toUpperCase();
   $("miniGameQuestion").textContent = question;
@@ -232,7 +257,7 @@ $("closeMiniGame").addEventListener("click",()=>{$("miniGamePanel").classList.ad
 
 function showParentGate(title){
   const available=(state.questions||[]).filter(q=>!state.answered.includes(q.id));
-  $("miniGamePanel").classList.add("hidden");
+  ["miniGamePanel","quizPanel","ticTacToePanel","racePanel","shootPanel"].forEach(id=>$(id).classList.add("hidden"));
   $("parentGatePanel").classList.remove("hidden");
   $("gateTitle").textContent=title||"A little challenge before your next try!";
   $("gateAnswer").value="";setFeedback("gateFeedback","");
@@ -241,12 +266,14 @@ function showParentGate(title){
     $("gateQuestion").textContent="There are no new parent questions yet. Ask a parent to add one in Parent Corner.";
     $("gateAnswer").classList.add("hidden");
     $("checkGateAnswer").classList.add("hidden");
+    $("parentGatePanel").scrollIntoView({behavior:"smooth",block:"center"});
     return;
   }
   $("gateAnswer").classList.remove("hidden");
   $("checkGateAnswer").classList.remove("hidden");
   activeGateQuestion=available[Math.floor(Math.random()*available.length)];
   $("gateQuestion").textContent=activeGateQuestion.question;
+  $("parentGatePanel").scrollIntoView({behavior:"smooth",block:"center"});
 }
 $("checkGateAnswer").addEventListener("click",()=>{
   if(!activeGateQuestion){setFeedback("gateFeedback","Ask a parent to add a question first.",true);return;}
@@ -302,10 +329,14 @@ go("home");
 const ticBoard = Array(9).fill("");
 let ticTurn = "X";
 let ticFinished = false;
+function showArcadePanel(id){
+  ["ticTacToePanel","racePanel","shootPanel","miniGamePanel","parentGatePanel","quizPanel"].forEach(panelId=>$(panelId).classList.add("hidden"));
+  $(id).classList.remove("hidden");
+  window.setTimeout(()=>$(id).scrollIntoView({behavior:"smooth",block:"center"}),50);
+}
 function startTicTacToe(){
   ticBoard.fill(""); ticTurn="X"; ticFinished=false;
-  $("ticTacToePanel").classList.remove("hidden");
-  $("racePanel").classList.add("hidden"); $("shootPanel").classList.add("hidden");
+  showArcadePanel("ticTacToePanel");
   renderTicTacToe();
 }
 function renderTicTacToe(){
@@ -340,8 +371,9 @@ $("ticTacToeReset").addEventListener("click",startTicTacToe);
 let raceRound=0;
 function startRace(){
   raceRound=0;
-  $("racePanel").classList.remove("hidden");$("ticTacToePanel").classList.add("hidden");$("shootPanel").classList.add("hidden");
+  showArcadePanel("racePanel");
   $("raceTrack").textContent="🏎️";$("raceFeedback").textContent="";
+  document.querySelectorAll("[data-lane]").forEach(b=>b.disabled=false);
   updateRaceStatus();
 }
 function updateRaceStatus(){$("raceStatus").textContent=`Round ${raceRound+1} of 5 — choose a lane!`;}
@@ -361,6 +393,7 @@ function chooseRaceLane(lane){
     state.points+=5;saveState();
     $("raceStatus").textContent="You finished the race! +5 stars ⭐";
     $("raceFeedback").textContent="Awesome driving!";
+    document.querySelectorAll("[data-lane]").forEach(b=>b.disabled=true);
   } else {$("raceFeedback").textContent="Clear lane! Keep going.";updateRaceStatus();}
 }
 $("raceGame").addEventListener("click",startRace);
@@ -369,7 +402,8 @@ document.querySelectorAll("[data-lane]").forEach(b=>b.addEventListener("click",(
 let shootStars=0, shootMisses=0;
 function startStarShooter(){
   shootStars=0;shootMisses=0;
-  $("shootPanel").classList.remove("hidden");$("ticTacToePanel").classList.add("hidden");$("racePanel").classList.add("hidden");
+  showArcadePanel("shootPanel");
+  $("shootStatus").textContent="Tap 5 stars. Avoid the clouds!";
   $("shootFeedback").textContent="";
   renderShootTargets();
 }
@@ -396,3 +430,6 @@ function renderShootTargets(){
 }
 $("shootGame").addEventListener("click",startStarShooter);
 document.querySelectorAll("[data-close-arcade]").forEach(b=>b.addEventListener("click",()=>$(b.dataset.closeArcade).classList.add("hidden")));
+
+// Keep all game cards responsive even after GitHub Pages/browser cache updates.
+window.addEventListener("pageshow",()=>{ renderAll(); });
