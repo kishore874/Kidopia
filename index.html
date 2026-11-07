@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KIDOPIA - Play Learn Explore</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+  background: #101638;
+  color: white;
+  min-height: 100vh;
+}
+
+header {
+  padding: 20px;
+  text-align: center;
+  background: linear-gradient(135deg,#633cff,#147de8);
+  border-radius: 0 0 25px 25px;
+}
+
+.logo {
+  font-size: 36px;
+  font-weight: 900;
+  color: #ffe66d;
+  text-shadow: 2px 3px #4524a8;
+}
+
+header p {
+  margin-top: 5px;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  padding: 15px 10px;
+}
+
+.stat {
+  background: #202b57;
+  padding: 12px 8px;
+  border-radius: 14px;
+  text-align: center;
+  flex: 1;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+h2 {
+  padding: 15px 18px;
+  font-size: 21px;
+}
+
+.player {
+  margin: 10px 15px;
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(120deg,#763cff,#dc48b7);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.avatar {
+  font-size: 55px;
+}
+
+.player button {
+  margin-top: 8px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 20px;
+  background: #ffe66d;
+  font-weight: bold;
+}
+
+.games {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 12px;
+  padding: 12px;
+}
+
+.game {
+  min-width: 0;
+  padding: 18px 8px;
+  text-align: center;
+  border-radius: 20px;
+  background: #202b57;
+  border: 1px solid #394b86;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.game:active {
+  transform: scale(.95);
+}
+
+.game .icon {
+  font-size: 42px;
+}
+
+.game h3 {
+  margin-top: 8px;
+  font-size: 16px;
+}
+
+.game p {
+  font-size: 12px;
+  color: #c5d1ff;
+  margin-top: 5px;
+}
+
+.mission {
+  margin: 10px 15px;
+  padding: 18px;
+  background: #202b57;
+  border-radius: 18px;
+}
+
+.mission button {
+  background: #20c997;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  width: 100%;
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+  background: #202b57;
+  padding: 14px 3px;
+  margin-top: 20px;
+}
+
+nav button {
+  color: white;
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+nav span {
+  display: block;
+  font-size: 23px;
+  margin-bottom: 5px;
+}
+
+#message {
+  text-align: center;
+  padding: 18px;
+  color: #ffe66d;
+  font-weight: bold;
+}
+
+@media(min-width:600px) {
+  .games {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+
+  main {
+    max-width: 850px;
+    margin: auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">🌈 KIDOPIA</div>
+  <p>Play • Learn • Earn • Explore</p>
+</header>
+
+<div class="stats">
+  <div class="stat">🪙 <span id="coins">500</span><br>Coins</div>
+  <div class="stat">💎 20<br>Gems</div>
+  <div class="stat">⚡ <span id="energy">80</span><br>Energy</div>
+  <div class="stat">⭐ 1<br>Level</div>
+</div>
+
+<main>
+
+<div class="player">
+  <div class="avatar">🧒</div>
+  <div>
+    <h3>Welcome, Explorer!</h3>
+    <p>Level 1 • Beginner</p>
+    <button onclick="alert('Character customization coming soon!')">
+      Customize Character
+    </button>
+  </div>
+</div>
+
+<h2>🎮 Explore Game World</h2>
+
+<div class="games">
+
+  <div class="game" onclick="playGame('Racing World')">
+    <div class="icon">🏎️</div>
+    <h3>Racing World</h3>
+    <p>Speed and adventure!</p>
+  </div>
+
+  <div class="game" onclick="playGame('Space Explorer')">
+    <div class="icon">🚀</div>
+    <h3>Space Explorer</h3>
+    <p>Explore the universe!</p>
+  </div>
+
+  <div class="game" onclick="playGame('Puzzle Master')">
+    <div class="icon">🧩</div>
+    <h3>Puzzle Master</h3>
+    <p>Train your brain!</p>
+  </div>
+
+  <div class="game" onclick="playGame('Adventure Quest')">
+    <div class="icon">🏰</div>
+    <h3>Adventure Quest</h3>
+    <p>Discover new worlds!</p>
+  </div>
+
+  <div class="game" onclick="playGame('Maths Games')">
+    <div class="icon">🔢</div>
+    <h3>Maths Games</h3>
+    <p>Learn with fun!</p>
+  </div>
+
+  <div class="game" onclick="playGame('Treasure Hunt')">
+    <div class="icon">💎</div>
+    <h3>Treasure Hunt</h3>
+    <p>Find hidden treasures!</p>
+  </div>
+
+  <div class="game" onclick="playGame('Pet Adventure')">
+    <div class="icon">🐼</div>
+    <h3>Pet Adventure</h3>
+    <p>Meet your new friend!</p>
+  </div>
+
+  <div class="game" onclick="playGame('Build Your City')">
+    <div class="icon">🏡</div>
+    <h3>Build Your City</h3>
+    <p>Create your dream city!</p>
+  </div>
+
+</div>
+
+<h2>🎯 Daily Mission</h2>
+
+<div class="mission">
+  <h3>🌟 First Explorer</h3>
+  <p>Explore any game in KIDOPIA.</p>
+  <button onclick="completeMission()">Collect 50 Coins</button>
+</div>
+
+<div id="message" aria-live="polite">
+  ✨ Your adventure starts here!
+</div>
+
+</main>
+
+<nav>
+  <button onclick="showMessage('Home')"><span>🏠</span>Home</button>
+  <button onclick="showMessage('Shop coming soon!')"><span>🛒</span>Shop</button>
+  <button onclick="showMessage('Pets coming soon!')"><span>🐾</span>Pets</button>
+  <button onclick="showMessage('Missions coming soon!')"><span>🏆</span>Missions</button>
+  <button onclick="showMessage('Achievements coming soon!')"><span>⭐</span>Rewards</button>
+</nav>
+
+<script>
+let coins = 500;
+let energy = 80;
+let missionDone = false;
+
+function showMessage(text) {
+  document.getElementById('message').textContent = text;
+}
+
+function playGame(name) {
+  if (energy < 10) {
+    showMessage('⚡ Your energy is low! Take a break.');
+    return;
+  }
+
+  energy -= 10;
+  document.getElementById('energy').textContent = energy;
+  showMessage('🎮 Welcome to ' + name + '! Game coming soon.');
+}
+
+function completeMission() {
+  if (missionDone) {
+    showMessage('🏆 Mission already completed!');
+    return;
+  }
+
+  missionDone = true;
+  coins += 50;
+  document.getElementById('coins').textContent = coins;
+  showMessage('🎉 Mission completed! You earned 50 coins!');
+}
+</script>
+
+</body>
+</html>
