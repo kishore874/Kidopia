@@ -67,8 +67,56 @@
           <button class="secondary-button hidden" id="nextQuestion">Next question</button>
         </div>
         <div class="game-card number-game">
-          <div class="game-icon">🔢</div><div class="game-copy"><p class="eyebrow">NUMBER FUN</p><h2>Number guess</h2><p>Guess a number from 1 to 5.</p></div>
+          <div class="game-icon">🔢</div><div class="game-copy"><p class="eyebrow">NUMBER FUN</p><h2>Number dash</h2><p>Solve a quick number puzzle.</p></div>
           <button class="primary-button" id="numberGame">Play</button>
+        </div>
+        <div class="game-card animal-game">
+          <div class="game-icon">🐾</div><div class="game-copy"><p class="eyebrow">ANIMAL FUN</p><h2>Animal match</h2><p>Find the animal that matches.</p></div>
+          <button class="primary-button" id="animalGame">Play</button>
+        </div>
+        <div class="game-card odd-game">
+          <div class="game-icon">🧩</div><div class="game-copy"><p class="eyebrow">THINK FAST</p><h2>Odd one out</h2><p>Spot the one that is different.</p></div>
+          <button class="primary-button" id="oddGame">Play</button>
+        </div>
+        <div class="game-card bonus-game">
+          <div class="game-icon">🌟</div><div class="game-copy"><p class="eyebrow">SPECIAL FEATURE</p><h2>Bonus round</h2><p>Unlock a bonus game with a parent question.</p></div>
+          <button class="primary-button" id="bonusGame">Unlock</button>
+        </div>
+        <div class="game-card"><div class="game-icon">⭕</div><div class="game-copy"><p class="eyebrow">TWO-PLAYER PUZZLE</p><h2>Tic Tac Toe</h2><p>Play X and O on the same phone.</p></div><button class="primary-button" id="ticTacToeGame">Play</button></div>
+        <div class="game-card"><div class="game-icon">🏎️</div><div class="game-copy"><p class="eyebrow">ARCADE RACE</p><h2>Lane Race</h2><p>Pick a lane and dodge the cones.</p></div><button class="primary-button" id="raceGame">Race</button></div>
+        <div class="game-card"><div class="game-icon">⭐</div><div class="game-copy"><p class="eyebrow">AIM & TAP</p><h2>Star Shooter</h2><p>Tap the stars and avoid the clouds.</p></div><button class="primary-button" id="shootGame">Play</button></div>
+
+        <div class="arcade-panel hidden" id="ticTacToePanel">
+          <div class="quiz-top"><span class="eyebrow">TIC TAC TOE</span><button class="text-button" data-close-arcade="ticTacToePanel">Close ×</button></div>
+          <h2 id="ticTacToeStatus">Player X's turn</h2><div class="tic-grid" id="ticTacToeGrid"></div>
+          <button class="secondary-button" id="ticTacToeReset">New game</button>
+        </div>
+        <div class="arcade-panel hidden" id="racePanel">
+          <div class="quiz-top"><span class="eyebrow">LANE RACE 🏁</span><button class="text-button" data-close-arcade="racePanel">Close ×</button></div>
+          <h2 id="raceStatus">Choose a lane to start!</h2><div class="race-track" id="raceTrack">🏎️</div>
+          <div class="lane-buttons"><button data-lane="0">Left lane</button><button data-lane="1">Middle lane</button><button data-lane="2">Right lane</button></div>
+          <p class="feedback" id="raceFeedback" aria-live="polite"></p>
+        </div>
+        <div class="arcade-panel hidden" id="shootPanel">
+          <div class="quiz-top"><span class="eyebrow">STAR SHOOTER ✨</span><button class="text-button" data-close-arcade="shootPanel">Close ×</button></div>
+          <h2 id="shootStatus">Tap 8 stars. Avoid the clouds!</h2><p class="shoot-score" id="shootScore">Stars: 0 / 8 · Misses: 0 / 3</p>
+          <div class="shoot-targets" id="shootTargets"></div>
+          <p class="feedback" id="shootFeedback" aria-live="polite"></p>
+        </div>
+        <div class="mini-game-panel hidden" id="miniGamePanel">
+          <div class="quiz-top"><span class="eyebrow" id="miniGameLabel">MINI GAME</span><button class="text-button" id="closeMiniGame">Close ×</button></div>
+          <h2 id="miniGameQuestion">Ready?</h2>
+          <div class="answer-list" id="miniGameAnswers"></div>
+          <p class="feedback" id="miniGameFeedback" aria-live="polite"></p>
+        </div>
+        <div class="gate-panel hidden" id="parentGatePanel">
+          <div class="gate-icon">🔐</div>
+          <p class="eyebrow">PARENT QUESTION CHALLENGE</p>
+          <h2 id="gateTitle">A little challenge before your next try!</h2>
+          <p id="gateQuestion">Answer a question from your parent to continue.</p>
+          <input id="gateAnswer" placeholder="Type your answer" autocomplete="off">
+          <button class="primary-button full-button" id="checkGateAnswer">Check answer & continue</button>
+          <p class="feedback" id="gateFeedback" aria-live="polite"></p>
         </div>
         <div class="parent-questions">
           <div><p class="eyebrow">FROM YOUR FAMILY</p><h2>Parent questions</h2><p>Answer questions your parent has added.</p></div>

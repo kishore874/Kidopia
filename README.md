@@ -28,3 +28,9 @@ This is a front-end learning prototype. It does NOT provide real email registrat
 For a real service used by families, add a trusted backend and authentication, server-side parent verification, data validation, privacy protections, and parental consent appropriate to the places where it is offered. Do not collect children's sensitive personal information in this demo.
 
 The site uses Google Fonts from the internet; if offline, it falls back to system fonts.
+
+
+## Version 1.2 arcade games
+- Tic Tac Toe: two-player game on one device; a Player O win triggers a parent-question gate, and Player X wins earn 5 stars.
+- Lane Race: choose one of three lanes for five rounds; hitting a cone triggers a parent-question gate.
+- Star Shooter: a safe tap-the-stars game; avoid clouds, and three misses trigger a parent-question gate. Collect five stars to earn 5 points.

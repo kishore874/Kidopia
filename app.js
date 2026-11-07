@@ -143,18 +143,122 @@ function answerQuiz(answer,button){
   if(quizAnswered)return;quizAnswered=true;
   document.querySelectorAll("[data-answer]").forEach(b=>{b.disabled=true;if(b.dataset.answer===currentQuiz.correct)b.classList.add("correct");});
   if(answer===currentQuiz.correct){state.points+=5;saveState();$("quizFeedback").textContent="Brilliant! You earned 5 stars. ⭐";}
-  else{$("quizFeedback").textContent="Good try! The right answer is "+currentQuiz.correct+".";button.classList.add("wrong");}
+  else{
+    $("quizFeedback").textContent="Good try! The right answer is "+currentQuiz.correct+". Answer a parent question to unlock your next challenge.";
+    button.classList.add("wrong");
+    pendingAfterGate = startQuiz;
+    window.setTimeout(()=>showParentGate("You can unlock your next quiz by answering a family question!"),650);
+  }
   $("nextQuestion").classList.remove("hidden");
 }
 $("startQuiz").addEventListener("click",startQuiz);
 $("nextQuestion").addEventListener("click",startQuiz);
-$("numberGame").addEventListener("click",()=>{
-  const target=Math.floor(Math.random()*5)+1;
-  const guess=prompt("Guess a number from 1 to 5:");
-  if(guess===null)return;
-  if(Number(guess)===target){state.points+=3;saveState();showToast("You guessed it! +3 stars ⭐");}
-  else showToast("Nice try! The number was "+target+". Try again!");
+let miniGameMode = "";
+let pendingAfterGate = null;
+let activeGateQuestion = null;
+
+function openMiniGame(label, question, answers, correct, points=3){
+  miniGameMode = label;
+  $("miniGameLabel").textContent = label.toUpperCase();
+  $("miniGameQuestion").textContent = question;
+  $("miniGameFeedback").textContent = "";
+  $("miniGamePanel").classList.remove("hidden");
+  $("parentGatePanel").classList.add("hidden");
+  $("miniGameAnswers").innerHTML = answers.map((a,i)=>`<button class="answer-button" data-mini-answer="${i}">${a}</button>`).join("");
+  document.querySelectorAll("[data-mini-answer]").forEach(btn=>btn.addEventListener("click",()=>{
+    if(btn.disabled)return;
+    const chosen=Number(btn.dataset.miniAnswer);
+    document.querySelectorAll("[data-mini-answer]").forEach(x=>x.disabled=true);
+    if(chosen===correct){
+      state.points+=points;saveState();
+      $("miniGameFeedback").textContent="Fantastic! You earned "+points+" stars. ⭐";
+      showToast("Correct answer! +"+points+" stars");
+    } else {
+      btn.classList.add("wrong");
+      document.querySelectorAll("[data-mini-answer]")[correct]?.classList.add("correct");
+      $("miniGameFeedback").textContent="Not quite! Let's try a parent question to unlock your next try.";
+      pendingAfterGate = ()=>openRandomMiniGameAgain(label);
+      window.setTimeout(showParentGate,650);
+    }
+  }));
+  $("miniGamePanel").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function openRandomMiniGameAgain(label){
+  if(label==="NUMBER DASH") startNumberDash();
+  else if(label==="ANIMAL MATCH") startAnimalMatch();
+  else if(label==="ODD ONE OUT") startOddOneOut();
+  else startBonusRound();
+}
+function startNumberDash(){
+  const a=Math.floor(Math.random()*8)+2, b=Math.floor(Math.random()*8)+1;
+  const correct=String(a+b), options=[correct,String(a+b+1),String(Math.max(1,a+b-1)),String(a+b+3)];
+  const shuffled=shuffle(options);
+  openMiniGame("Number dash",`What is ${a} + ${b}?`,shuffled,shuffled.indexOf(correct),3);
+}
+function startAnimalMatch(){
+  const items=[{q:"Which animal says 'moo'?",a:["Cow 🐮","Duck 🦆","Cat 🐱","Lion 🦁"],c:0},
+    {q:"Which animal can hop?",a:["Fish 🐟","Rabbit 🐰","Whale 🐳","Eagle 🦅"],c:1},
+    {q:"Which animal has a long trunk?",a:["Fox 🦊","Panda 🐼","Elephant 🐘","Frog 🐸"],c:2}];
+  const item=items[Math.floor(Math.random()*items.length)];
+  openMiniGame("Animal match",item.q,item.a,item.c,3);
+}
+function startOddOneOut(){
+  const items=[
+    {q:"Which one is not a fruit?",a:["Apple 🍎","Banana 🍌","Carrot 🥕","Grape 🍇"],c:2},
+    {q:"Which one can fly?",a:["Butterfly 🦋","Turtle 🐢","Dog 🐶","Elephant 🐘"],c:0},
+    {q:"Which one is a shape?",a:["Circle 🔵","Mango 🥭","Pencil ✏️","Cloud ☁️"],c:0}
+  ];
+  const item=items[Math.floor(Math.random()*items.length)];
+  openMiniGame("Odd one out",item.q,item.a,item.c,3);
+}
+function startBonusRound(){
+  const items=[
+    {q:"What comes next? 2, 4, 6, __",a:["7","8","9","10"],c:1},
+    {q:"How many sides does a triangle have?",a:["2","3","4","5"],c:1},
+    {q:"Which is the biggest number?",a:["12","21","9","18"],c:1}
+  ];
+  const item=items[Math.floor(Math.random()*items.length)];
+  openMiniGame("Bonus round",item.q,item.a,item.c,8);
+}
+function shuffle(array){return [...array].sort(()=>Math.random()-.5);}
+$("numberGame").addEventListener("click",startNumberDash);
+$("animalGame").addEventListener("click",startAnimalMatch);
+$("oddGame").addEventListener("click",startOddOneOut);
+$("bonusGame").addEventListener("click",()=>{
+  pendingAfterGate=startBonusRound;
+  showParentGate("Answer a family question to unlock the bonus round!");
 });
+$("closeMiniGame").addEventListener("click",()=>{$("miniGamePanel").classList.add("hidden");});
+
+function showParentGate(title){
+  const available=(state.questions||[]).filter(q=>!state.answered.includes(q.id));
+  $("miniGamePanel").classList.add("hidden");
+  $("parentGatePanel").classList.remove("hidden");
+  $("gateTitle").textContent=title||"A little challenge before your next try!";
+  $("gateAnswer").value="";setFeedback("gateFeedback","");
+  if(!available.length){
+    activeGateQuestion=null;
+    $("gateQuestion").textContent="There are no new parent questions yet. Ask a parent to add one in Parent Corner.";
+    $("gateAnswer").classList.add("hidden");
+    $("checkGateAnswer").classList.add("hidden");
+    return;
+  }
+  $("gateAnswer").classList.remove("hidden");
+  $("checkGateAnswer").classList.remove("hidden");
+  activeGateQuestion=available[Math.floor(Math.random()*available.length)];
+  $("gateQuestion").textContent=activeGateQuestion.question;
+}
+$("checkGateAnswer").addEventListener("click",()=>{
+  if(!activeGateQuestion){setFeedback("gateFeedback","Ask a parent to add a question first.",true);return;}
+  if(clean($("gateAnswer").value).toLowerCase()===clean(activeGateQuestion.answer).toLowerCase()){
+    const q=activeGateQuestion;state.points+=Number(q.points);state.answered.push(q.id);saveState();
+    $("parentGatePanel").classList.add("hidden");showToast("Great! +"+q.points+" stars. Feature unlocked!");
+    const next=pendingAfterGate;pendingAfterGate=null;activeGateQuestion=null;
+    if(next)next();
+    renderFamilyQuestions();
+  } else setFeedback("gateFeedback","Not quite. Try again, or ask your parent for a hint.",true);
+});
+$("gateAnswer").addEventListener("keydown",e=>{if(e.key==="Enter")$("checkGateAnswer").click();});
 
 function renderFamilyQuestions(){
   const questions=state.questions||[];
@@ -193,3 +297,102 @@ function renderManageQuestions(){
 }
 renderAll();
 go("home");
+
+/* Version 1.2 arcade games */
+const ticBoard = Array(9).fill("");
+let ticTurn = "X";
+let ticFinished = false;
+function startTicTacToe(){
+  ticBoard.fill(""); ticTurn="X"; ticFinished=false;
+  $("ticTacToePanel").classList.remove("hidden");
+  $("racePanel").classList.add("hidden"); $("shootPanel").classList.add("hidden");
+  renderTicTacToe();
+}
+function renderTicTacToe(){
+  $("ticTacToeStatus").textContent=ticFinished?"Game finished":`Player ${ticTurn}'s turn`;
+  $("ticTacToeGrid").innerHTML=ticBoard.map((v,i)=>`<button class="tic-cell" data-tic="${i}" aria-label="Square ${i+1}">${v}</button>`).join("");
+  document.querySelectorAll("[data-tic]").forEach(b=>b.addEventListener("click",()=>playTicCell(Number(b.dataset.tic))));
+}
+function playTicCell(i){
+  if(ticFinished||ticBoard[i])return;
+  ticBoard[i]=ticTurn;
+  const player=ticTurn;
+  const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  const winner=lines.some(line=>line.every(n=>ticBoard[n]===player));
+  if(winner){
+    ticFinished=true;renderTicTacToe();
+    if(player==="X"){
+      state.points+=5;saveState();$("ticTacToeStatus").textContent="Player X wins! +5 stars ⭐";
+    } else {
+      $("ticTacToeStatus").textContent="Player O wins. Answer a family question to play again!";
+      pendingAfterGate=startTicTacToe;
+      showParentGate("You lost this round! Answer a parent question to unlock another game.");
+    }
+    return;
+  }
+  if(ticBoard.every(Boolean)){ticFinished=true;renderTicTacToe();$("ticTacToeStatus").textContent="It's a draw! Good game.";return;}
+  ticTurn=player==="X"?"O":"X";
+  renderTicTacToe();
+}
+$("ticTacToeGame").addEventListener("click",startTicTacToe);
+$("ticTacToeReset").addEventListener("click",startTicTacToe);
+
+let raceRound=0;
+function startRace(){
+  raceRound=0;
+  $("racePanel").classList.remove("hidden");$("ticTacToePanel").classList.add("hidden");$("shootPanel").classList.add("hidden");
+  $("raceTrack").textContent="🏎️";$("raceFeedback").textContent="";
+  updateRaceStatus();
+}
+function updateRaceStatus(){$("raceStatus").textContent=`Round ${raceRound+1} of 5 — choose a lane!`;}
+function chooseRaceLane(lane){
+  if(raceRound>=5)return;
+  const hazard=Math.floor(Math.random()*3);
+  if(lane===hazard){
+    $("raceTrack").textContent="🚧";
+    $("raceFeedback").textContent="Oops! You bumped a cone. Answer a family question to try the race again.";
+    pendingAfterGate=startRace;
+    showParentGate("Race over! Answer a parent question to unlock another race.");
+    return;
+  }
+  raceRound++;
+  $("raceTrack").textContent=["🏎️","🚗","🚙"][lane];
+  if(raceRound>=5){
+    state.points+=5;saveState();
+    $("raceStatus").textContent="You finished the race! +5 stars ⭐";
+    $("raceFeedback").textContent="Awesome driving!";
+  } else {$("raceFeedback").textContent="Clear lane! Keep going.";updateRaceStatus();}
+}
+$("raceGame").addEventListener("click",startRace);
+document.querySelectorAll("[data-lane]").forEach(b=>b.addEventListener("click",()=>chooseRaceLane(Number(b.dataset.lane))));
+
+let shootStars=0, shootMisses=0;
+function startStarShooter(){
+  shootStars=0;shootMisses=0;
+  $("shootPanel").classList.remove("hidden");$("ticTacToePanel").classList.add("hidden");$("racePanel").classList.add("hidden");
+  $("shootFeedback").textContent="";
+  renderShootTargets();
+}
+function renderShootTargets(){
+  $("shootScore").textContent=`Stars: ${shootStars} / 8 · Misses: ${shootMisses} / 3`;
+  const symbols=shuffle(["⭐","⭐","⭐","⭐","⭐","☁️","☁️","☁️"]);
+  $("shootTargets").innerHTML=symbols.map((s,i)=>`<button class="shoot-target" data-target="${s==="⭐"?"star":"cloud"}" aria-label="${s==="⭐"?"Star":"Cloud"}">${s}</button>`).join("");
+  document.querySelectorAll("[data-target]").forEach(b=>b.addEventListener("click",()=>{
+    if(b.disabled)return;b.disabled=true;
+    if(b.dataset.target==="star"){shootStars++;b.textContent="✨";}
+    else {shootMisses++;b.textContent="💨";}
+    $("shootScore").textContent=`Stars: ${shootStars} / 8 · Misses: ${shootMisses} / 3`;
+    if(shootStars>=5){
+      state.points+=5;saveState();$("shootStatus").textContent="Star collector! +5 stars ⭐";$("shootFeedback").textContent="You found 5 stars. Great job!";
+      document.querySelectorAll("[data-target]").forEach(x=>x.disabled=true);
+    } else if(shootMisses>=3){
+      $("shootStatus").textContent="Round over!";
+      $("shootFeedback").textContent="Too many clouds! Answer a family question to try again.";
+      document.querySelectorAll("[data-target]").forEach(x=>x.disabled=true);
+      pendingAfterGate=startStarShooter;
+      showParentGate("Star game over! Answer a parent question to unlock another round.");
+    }
+  }));
+}
+$("shootGame").addEventListener("click",startStarShooter);
+document.querySelectorAll("[data-close-arcade]").forEach(b=>b.addEventListener("click",()=>$(b.dataset.closeArcade).classList.add("hidden")));
